@@ -78,7 +78,7 @@ initMap = () => {
         scrollWheelZoom: false
       });
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.jpg70?access_token={mapboxToken}', {
-    mapboxToken: '<your MAPBOX API KEY HERE>',
+    mapboxToken: 'pk.eyJ1IjoicnVoYW5yayIsImEiOiJjam4zeWd0czk1OTAzM3BueG40eHRydWNvIn0.vWbNZrj8Ge_pd_XQF4gFpQ',
     maxZoom: 18,
     attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
       '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -160,19 +160,31 @@ createRestaurantHTML = (restaurant) => {
 
   const image = document.createElement('img');
   image.className = 'restaurant-img';
-  image.src = DBHelper.imageUrlForRestaurant(restaurant);
+  let imgUrl = DBHelper.imageUrlForRestaurant(restaurant);
+  imgUrl = imgUrl.substring(0, imgUrl.length-4);
+  const img1x = imgUrl + "_320.jpg";
+  const img2x = imgUrl + "_600.jpeg";
+  image.src = img1x;
+  image.srcset = `${img1x} 320w, ${img2x} 600w`;
+  image.sizes = `(max-width: 600px) 320px, (max-width: 900px) 600px, 800px`;
+  image.setAttribute('tabindex', 0);
+  image.alt = `${restaurant.name} restaurant in ${restaurant.neighborhood}`;
   li.append(image);
 
   const name = document.createElement('h1');
   name.innerHTML = restaurant.name;
+  name.setAttribute('tabindex', 0);
+  name.setAttribute('role', 'heading');
   li.append(name);
 
   const neighborhood = document.createElement('p');
   neighborhood.innerHTML = restaurant.neighborhood;
+  neighborhood.setAttribute('tabindex', 0);
   li.append(neighborhood);
 
   const address = document.createElement('p');
   address.innerHTML = restaurant.address;
+  address.setAttribute('tabindex', 0);
   li.append(address);
 
   const more = document.createElement('a');
@@ -208,4 +220,16 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     self.markers.push(marker);
   });
 } */
+
+
+/*==========Register Service Worker==========*/
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> {
+    navigator.serviceWorker
+      .register('/sw_file.js')
+        // checking whether it's support browser or not
+        .then(res => console.log(`Service Worker Registered: ${res}`))
+        .catch(err => console.log(`Something Wrong here ${err}`))
+  });
+};
 
